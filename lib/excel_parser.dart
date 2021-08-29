@@ -34,16 +34,23 @@ List<DataRow> parseRaw(Uint8List data) {
   return parsed;
 }
 
-DataCell _parseCell(Data? data) => data == null ? DataCell(CellType.String, '') : DataCell(data.cellType, data.value);
+DataCell _parseCell(Data? data) => data == null
+    ? DataCell(CellType.String, '')
+    : DataCell(data.cellType, data.value);
 
-dynamic _validateDataCell(DataCell dataCell) => dataCell.item1 == CellType.Formula ? '' : dataCell.item2;
+dynamic _validateDataCell(DataCell dataCell) =>
+    dataCell.item1 == CellType.Formula ? '' : dataCell.item2;
 
 String rawDataToJson(List<DataRow> rawData, bool prettify) {
   return JsonEncoder.withIndent(
-      prettify ? '  ' : null, (dynamic obj) => obj is DataCell ? _validateDataCell(obj) : obj.toString()).convert(rawData);
+          prettify ? '  ' : null,
+          (dynamic obj) =>
+              obj is DataCell ? _validateDataCell(obj) : obj.toString())
+      .convert(rawData);
 }
 
-String rawDataToSeparatedText(List<DataRow> rawData, String cellSeparator, {String lineSeparator = '\n'}) {
+String rawDataToSeparatedText(List<DataRow> rawData, String cellSeparator,
+    {String lineSeparator = '\n'}) {
   final sb = StringBuffer();
   for (var dataRow in rawData) {
     sb.writeAll(dataRow.map(_validateDataCell), cellSeparator);

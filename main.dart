@@ -14,8 +14,12 @@ Future<void> main(List<String> arguments) async {
     defaultsTo: 'json',
     allowed: availableFormats,
   );
-  argsParser.addFlag('prettify', abbr: 'p', negatable: false, help: 'Prettify json output');
-  argsParser.addOption('outFile', abbr: 'o', help: 'If not provided, will print to console.');
+  argsParser.addFlag('prettify',
+      abbr: 'p', negatable: false, help: 'Prettify json output');
+  argsParser.addFlag('ignore',
+      abbr: 'i', defaultsTo: true, help: 'Ignore "#N/A" cell');
+  argsParser.addOption('outFile',
+      abbr: 'o', help: 'If not provided, will print to console.');
 
   try {
     final results = argsParser.parse(arguments);
@@ -41,6 +45,7 @@ Future<void> main(List<String> arguments) async {
     }
 
     bool usePrettify = results['prettify'];
+    bool ignoreNA = results['ignore'];
 
     File? outputFile;
     if (results['outFile'] != null) {
@@ -66,6 +71,7 @@ Future<void> main(List<String> arguments) async {
         output = excel_parser.rawDataToSeparatedText(rawData, '\t');
         break;
     }
+    if (ignoreNA) output = output.replaceAll('#N/A', '');
 
     if (outputFile != null) {
       outputFile = await outputFile.create(recursive: true);
